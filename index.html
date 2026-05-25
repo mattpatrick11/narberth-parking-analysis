@@ -864,7 +864,57 @@
       </div>
     </div>
 
-    <h3>Survey Responses (Anonymized)</h3>
+    <h3>Density Preference Rankings</h3>
+    <p class="section-intro" style="margin-bottom:24px;">Respondents ranked four development scenarios from 1 (most preferred) to 4 (least preferred). The results are unambiguous: <strong>Single Family (2–4 homes) is overwhelmingly the most preferred</strong>, and Max Density (30–40 units) is overwhelmingly the least preferred.</p>
+
+    <div class="callout blue">
+      <strong>How to read this:</strong> A lower average rank score = more preferred. Score of 1.0 would mean every respondent ranked it #1. Score of 4.0 would mean every respondent ranked it #4 (least preferred).
+    </div>
+
+    <div class="chart-grid" style="margin-top:24px;">
+      <div class="chart-card">
+        <h3>Average Rank Score by Density Option</h3>
+        <p class="chart-subtitle">Lower score = more preferred. Single Family averages 1.25 — near-unanimous first choice. Max Density averages 3.93 — near-unanimous last choice.</p>
+        <canvas id="rankAvgChart" height="240"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>How Many Times Each Option Was Ranked #1 (Most Preferred)</h3>
+        <p class="chart-subtitle">Out of 28 respondents. Single Family received 24 first-place votes. Max Density received just 2.</p>
+        <canvas id="rank1Chart" height="240"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Full Rank Distribution — Max Density (30–40 units)</h3>
+        <p class="chart-subtitle">How respondents distributed their rankings for the highest-density option.</p>
+        <canvas id="maxDistChart" height="220"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Full Rank Distribution — Single Family (2–4 homes)</h3>
+        <p class="chart-subtitle">How respondents distributed their rankings for the lowest-density option.</p>
+        <canvas id="sfhDistChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 8px;">Summary Table: Average Rank by Density Option</h3>
+    <table class="scenario-table" style="margin-bottom:32px;">
+      <thead>
+        <tr>
+          <th>Density Option</th>
+          <th>Avg Rank Score</th>
+          <th># Ranked 1st</th>
+          <th># Ranked 2nd</th>
+          <th># Ranked 3rd</th>
+          <th># Ranked 4th (Least)</th>
+          <th>Community Verdict</th>
+        </tr>
+      </thead>
+      <tbody id="rankTableBody">
+      </tbody>
+    </table>
+
+    <h3>Individual Responses (Anonymized)</h3>
     <div class="survey-grid" id="surveyGrid">
       <!-- filled by JS -->
     </div>
@@ -1243,38 +1293,42 @@
 <script>
 // ─── DATA ───────────────────────────────────────────────────────────────────
 
+// 1=most preferred, 4=least preferred
 const surveyData = [
-  { cars: 0, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 1, driveway: "Yes" },
-  { cars: 1, driveway: "Yes" },
-  { cars: 2, driveway: "No" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "No" },
-  { cars: 3, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 0, driveway: "No" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 0, driveway: "Yes" },
-  { cars: 0, driveway: "Yes" },
-  { cars: 3, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 1, driveway: "No" },
-  { cars: 1, driveway: "No" },
-  { cars: 2, driveway: "Yes" },
-  { cars: 1, driveway: "No" },
-  { cars: 2, driveway: "Yes" }
+  { cars: 0, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 4, low: 4, sfh: 3 },
+  { cars: 3, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 0, driveway: "No",   max: 4, med: 4, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 4, low: 3, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 0, driveway: "Yes",  max: 1, med: 2, low: 3, sfh: 4 },
+  { cars: 0, driveway: "Yes",  max: 1, med: 2, low: 3, sfh: 4 },
+  { cars: 3, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 1, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 1, driveway: "No",   max: 4, med: 2, low: 1, sfh: 4 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 1, driveway: "No",   max: 4, med: 4, low: 1, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 }
 ];
 
 // ─── POPULATE SURVEY CARDS ──────────────────────────────────────────────────
+
+const rankColor = { 1: '#16a34a', 2: '#2563eb', 3: '#d97706', 4: '#dc2626' };
+const rankLabel = { 1: '1st (Most Preferred)', 2: '2nd', 3: '3rd', 4: '4th (Least Preferred)' };
 
 const grid = document.getElementById('surveyGrid');
 surveyData.forEach((r, i) => {
@@ -1282,8 +1336,13 @@ surveyData.forEach((r, i) => {
   card.className = 'survey-card';
   card.innerHTML = `
     <div class="respondent-label">Respondent #${i + 1}</div>
-    <div class="cars">${r.cars} 🚗</div>
-    <div style="font-size:0.82rem; color:var(--gray); margin-top:4px;">Driveway: ${r.driveway}</div>
+    <div class="cars" style="margin-bottom:10px;">${r.cars} 🚗 &nbsp;<span style="font-size:0.8rem;font-weight:500;color:var(--gray);">Driveway: ${r.driveway}</span></div>
+    <div style="font-size:0.8rem;line-height:1.9;">
+      <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${rankColor[r.max]};margin-right:6px;"></span><strong>Max Density (30–40 units):</strong> Rank ${r.max}</div>
+      <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${rankColor[r.med]};margin-right:6px;"></span><strong>Medium Density (15–25 units):</strong> Rank ${r.med}</div>
+      <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${rankColor[r.low]};margin-right:6px;"></span><strong>Low Density (5–15 units):</strong> Rank ${r.low}</div>
+      <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${rankColor[r.sfh]};margin-right:6px;"></span><strong>Single Family (2–4 homes):</strong> Rank ${r.sfh}</div>
+    </div>
   `;
   grid.appendChild(card);
 });
@@ -1618,6 +1677,136 @@ new Chart(document.getElementById('spacesChart'), {
     }
   }
 });
+
+// ─── RANKED CHOICE CHARTS ──────────────────────────────────────────────────
+
+const rcOptions = [
+  { key: 'max', label: 'Max Density (30-40 units)' },
+  { key: 'med', label: 'Medium Density (15-25 units)' },
+  { key: 'low', label: 'Low Density (5-15 units)' },
+  { key: 'sfh', label: 'Single Family (2-4 homes)' },
+];
+
+const rcStats = rcOptions.map(opt => {
+  const ranks = surveyData.map(r => r[opt.key]);
+  const avg = ranks.reduce((a,b) => a+b, 0) / ranks.length;
+  const r1 = ranks.filter(r => r === 1).length;
+  const r2 = ranks.filter(r => r === 2).length;
+  const r3 = ranks.filter(r => r === 3).length;
+  const r4 = ranks.filter(r => r === 4).length;
+  return { label: opt.label, avg, r1, r2, r3, r4 };
+});
+
+// Populate rank summary table
+const tbody = document.getElementById('rankTableBody');
+const verdicts = [
+  { bg: '#fee2e2', color: '#dc2626', text: 'Strongly Opposed' },
+  { bg: '#fef3c7', color: '#d97706', text: 'Generally Opposed' },
+  { bg: '#dbeafe', color: '#2563eb', text: 'Somewhat Acceptable' },
+  { bg: '#dcfce7', color: '#16a34a', text: 'Strongly Preferred' },
+];
+rcStats.forEach((stat, idx) => {
+  const v = verdicts[idx];
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><strong>' + stat.label + '</strong></td>' +
+    '<td style="font-weight:700;">' + stat.avg.toFixed(2) + '</td>' +
+    '<td>' + stat.r1 + '</td>' +
+    '<td>' + stat.r2 + '</td>' +
+    '<td>' + stat.r3 + '</td>' +
+    '<td>' + stat.r4 + '</td>' +
+    '<td><span style="background:' + v.bg + ';color:' + v.color + ';font-weight:700;padding:3px 10px;border-radius:99px;font-size:0.82rem;">' + v.text + '</span></td>';
+  tbody.appendChild(tr);
+});
+
+// Average rank bar chart
+new Chart(document.getElementById('rankAvgChart'), {
+  type: 'bar',
+  data: {
+    labels: rcStats.map(s => s.label),
+    datasets: [{
+      label: 'Average Rank (1=best, 4=worst)',
+      data: rcStats.map(s => parseFloat(s.avg.toFixed(2))),
+      backgroundColor: ['#dc2626', '#d97706', '#2563eb', '#16a34a'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        min: 0, max: 4,
+        title: { display: true, text: 'Avg Rank Score (lower = more preferred)' },
+        ticks: { stepSize: 1, callback: function(v) { return v === 1 ? '1 (Best)' : v === 4 ? '4 (Worst)' : v; } }
+      }
+    }
+  }
+});
+
+// # of 1st place votes
+new Chart(document.getElementById('rank1Chart'), {
+  type: 'bar',
+  data: {
+    labels: rcStats.map(s => s.label),
+    datasets: [{
+      label: '# of 1st Place Votes',
+      data: rcStats.map(s => s.r1),
+      backgroundColor: ['#dc2626', '#d97706', '#2563eb', '#16a34a'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        min: 0, max: 28,
+        title: { display: true, text: 'Number of Respondents (out of 28)' },
+        ticks: { stepSize: 4 }
+      }
+    }
+  }
+});
+
+// Max density full distribution
+new Chart(document.getElementById('maxDistChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Rank 1 (Most Preferred)', 'Rank 2', 'Rank 3', 'Rank 4 (Least Preferred)'],
+    datasets: [{
+      label: 'Respondents',
+      data: [rcStats[0].r1, rcStats[0].r2, rcStats[0].r3, rcStats[0].r4],
+      backgroundColor: ['#16a34a', '#2563eb', '#d97706', '#dc2626'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { title: { display: true, text: 'Respondents' }, ticks: { stepSize: 2 } } }
+  }
+});
+
+// SFH full distribution
+new Chart(document.getElementById('sfhDistChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Rank 1 (Most Preferred)', 'Rank 2', 'Rank 3', 'Rank 4 (Least Preferred)'],
+    datasets: [{
+      label: 'Respondents',
+      data: [rcStats[3].r1, rcStats[3].r2, rcStats[3].r3, rcStats[3].r4],
+      backgroundColor: ['#16a34a', '#2563eb', '#d97706', '#dc2626'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { title: { display: true, text: 'Respondents' }, ticks: { stepSize: 2 } } }
+  }
+});
+
 // ─── SAMPLE SIZE CHART ─────────────────────────────────────────────────────
 
 new Chart(document.getElementById('sampleChart'), {
