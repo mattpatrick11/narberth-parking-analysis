@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Narberth Borough Parking Study: A Data Counter-Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --navy: #1a2744;
+      --blue: #2563eb;
+      --light-blue: #dbeafe;
+      --red: #dc2626;
+      --light-red: #fee2e2;
+      --green: #16a34a;
+      --light-green: #dcfce7;
+      --amber: #d97706;
+      --light-amber: #fef3c7;
+      --gray: #6b7280;
+      --light-gray: #f3f4f6;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #111827;
+      background: #f9fafb;
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    header p.subtitle {
+      font-size: 1.1rem;
+      opacity: 0.8;
+      max-width: 700px;
+      margin: 0 auto 16px;
+    }
+
+    header .badge {
+      display: inline-block;
+      background: var(--red);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section:last-child { border-bottom: none; }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 24px 0 12px;
+    }
+
+    .section-intro {
+      color: var(--gray);
+      font-size: 1rem;
+      margin-bottom: 32px;
+      max-width: 800px;
+    }
+
+    /* KEY FINDING CALLOUT */
+    .callout {
+      border-left: 5px solid var(--red);
+      background: var(--light-red);
+      padding: 20px 24px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+    }
+
+    .callout.green {
+      border-color: var(--green);
+      background: var(--light-green);
+    }
+
+    .callout.amber {
+      border-color: var(--amber);
+      background: var(--light-amber);
+    }
+
+    .callout.blue {
+      border-color: var(--blue);
+      background: var(--light-blue);
+    }
+
+    .callout strong { font-weight: 700; }
+
+    /* STAT CARDS */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .stat-card .number {
+      font-size: 2.4rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-card.red .number { color: var(--red); }
+    .stat-card.green .number { color: var(--green); }
+    .stat-card.blue .number { color: var(--blue); }
+    .stat-card.amber .number { color: var(--amber); }
+
+    /* COMPARISON TABLE */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin: 24px 0;
+      font-size: 0.95rem;
+    }
+
+    .comparison-table th {
+      padding: 14px 16px;
+      font-weight: 700;
+      text-align: left;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .comparison-table th.krom { background: #fef2f2; color: var(--red); }
+    .comparison-table th.counter { background: #f0fdf4; color: var(--green); }
+    .comparison-table th.label-col { background: var(--light-gray); color: var(--navy); }
+
+    .comparison-table td {
+      padding: 13px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .comparison-table tr:nth-child(even) td { background: #fafafa; }
+
+    .comparison-table td.krom { color: var(--red); font-weight: 600; }
+    .comparison-table td.counter { color: var(--green); font-weight: 600; }
+
+    /* CHART CONTAINERS */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 24px;
+      margin: 32px 0;
+    }
+
+    @media (max-width: 600px) {
+      .chart-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .chart-card h3 {
+      margin-top: 0;
+      margin-bottom: 4px;
+    }
+
+    .chart-card .chart-subtitle {
+      font-size: 0.82rem;
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+
+    /* SCENARIO TABLE */
+    .scenario-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin: 24px 0;
+    }
+
+    .scenario-table th {
+      background: var(--navy);
+      color: white;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    .scenario-table td {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 0.93rem;
+    }
+
+    .scenario-table tr.highlight td {
+      background: #fef9c3;
+      font-weight: 700;
+    }
+
+    .scenario-table tr.danger td {
+      background: #fee2e2;
+      font-weight: 700;
+    }
+
+    .scenario-table tr.safe td {
+      background: #dcfce7;
+    }
+
+    /* MOE TABLE */
+    .moe-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin: 24px 0;
+      font-size: 0.9rem;
+    }
+
+    .moe-table th {
+      background: var(--navy);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.82rem;
+    }
+
+    .moe-table td { padding: 10px 14px; border-top: 1px solid var(--border); }
+
+    .moe-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .moe-badge.low { background: #dcfce7; color: var(--green); }
+    .moe-badge.med { background: #fef3c7; color: var(--amber); }
+    .moe-badge.high { background: #fee2e2; color: var(--red); }
+    .moe-badge.extreme { background: #7f1d1d; color: white; }
+
+    /* SURVEY SECTION */
+    .survey-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .survey-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      font-size: 0.9rem;
+    }
+
+    .survey-card .name { font-weight: 700; color: var(--navy); }
+    .survey-card .address { color: var(--gray); font-size: 0.82rem; margin-bottom: 8px; }
+    .survey-card .cars { font-size: 1.3rem; font-weight: 900; color: var(--blue); }
+
+    /* SOURCE FOOTER */
+    .sources {
+      background: var(--navy);
+      color: rgba(255,255,255,0.75);
+      padding: 40px 24px;
+      font-size: 0.85rem;
+    }
+
+    .sources h3 { color: white; margin-bottom: 16px; }
+    .sources a { color: #93c5fd; }
+    .sources ul { list-style: disc; padding-left: 20px; line-height: 2; }
+
+    /* PROGRESS BAR */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 10px 0;
+    }
+
+    .progress-label { min-width: 200px; font-size: 0.9rem; }
+    .progress-bar-wrap { flex: 1; background: #e5e7eb; border-radius: 99px; height: 20px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+    .progress-val { min-width: 60px; font-weight: 700; font-size: 0.9rem; text-align: right; }
+
+    /* TOD SECTION */
+    .tod-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 16px 0;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin: 4px 4px 4px 0;
+    }
+
+    .tag.red { background: var(--light-red); color: var(--red); }
+    .tag.green { background: var(--light-green); color: var(--green); }
+    .tag.blue { background: var(--light-blue); color: var(--blue); }
+
+    /* DEFICIT VIZ */
+    .deficit-viz {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin: 24px 0;
+    }
+
+    .deficit-title { font-size: 1.1rem; font-weight: 700; color: var(--navy); margin-bottom: 20px; }
+
+    .deficit-bar-container {
+      position: relative;
+      height: 60px;
+      border-radius: 8px;
+      overflow: visible;
+      margin: 24px 0;
+    }
+
+    .deficit-needed {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: #fee2e2;
+      border: 2px solid var(--red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--red);
+      font-size: 1.1rem;
+    }
+
+    .deficit-provided {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: #dcfce7;
+      border: 2px solid var(--green);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding-left: 16px;
+      font-weight: 700;
+      color: var(--green);
+      font-size: 1.1rem;
+    }
+
+    .deficit-gap-label {
+      position: absolute;
+      right: 0;
+      top: -28px;
+      font-size: 0.85rem;
+      color: var(--red);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <h1>Narberth Borough Parking:<br>A Data-Driven Counter-Analysis</h1>
+    <p class="subtitle">Challenging the ACS-based assumptions used to justify a 0.7 spaces/unit parking standard and zero-parking exemptions for affordable and small-unit housing.</p>
+    <span class="badge">⚠ Critical Review of Proposed Zoning Policy</span>
+  </div>
+</header>
+
+<!-- EXECUTIVE SUMMARY -->
+<section>
+  <div class="container">
+    <h2>Executive Summary</h2>
+    <p class="section-intro">Adam Krom presented American Community Survey (ACS) data to support a proposed parking ordinance requiring only 0.7 parking spaces per unit, with zero-parking requirements for affordable housing and units under 750 sq ft. This analysis demonstrates that the data is statistically unreliable for policy use, misrepresents actual car ownership, and would create a significant parking deficit by the proposal's own math.</p>
+
+    <div class="stat-grid">
+      <div class="stat-card red">
+        <div class="number">88%</div>
+        <div class="label">Renters with at least 1 car (ACS data, Krom's own source)</div>
+      </div>
+      <div class="stat-card red">
+        <div class="number">160%</div>
+        <div class="label">Margin of error for "3-car renter" households</div>
+      </div>
+      <div class="stat-card red">
+        <div class="number">−14.2</div>
+        <div class="label">Parking space deficit at 198 Elmwood Ave under proposed rules</div>
+      </div>
+      <div class="stat-card green">
+        <div class="number">93%</div>
+        <div class="label">Local survey respondents who own at least 1 car</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Bottom line:</strong> The proposed 0.7 spaces/unit standard, combined with zero-parking exemptions, would fail to meet parking demand by the proponent's own data — resulting in at least 14 unaccounted-for vehicles at a 40-unit development like 198 Elmwood Ave.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 1: THE DATA KROM PRESENTED -->
+<section>
+  <div class="container">
+    <h2>1. The Data as Presented by Krom</h2>
+    <p class="section-intro">Krom cited the U.S. Census Bureau's American Community Survey (ACS) 5-Year Estimates (Table B25044) for Narberth Borough (ZIP/place code 42526), presented as a cross-tabulation of vehicle availability by tenure. The table below reproduces his figures exactly.</p>
+
+    <h3>Krom's Cross-Tab (ACS 5-Year Estimates, 2024 Release)</h3>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th class="label-col">Category</th>
+          <th class="krom">Owners</th>
+          <th class="krom">Renters</th>
+          <th class="krom">Total</th>
+          <th class="krom">% of Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Total Households</strong></td><td class="krom">1,107</td><td class="krom">894</td><td class="krom">2,001</td><td class="krom">100%</td></tr>
+        <tr><td>With 0 Vehicles</td><td class="krom">0</td><td class="krom">98</td><td class="krom">98</td><td class="krom">5%</td></tr>
+        <tr><td>With 1 Vehicle</td><td class="krom">413</td><td class="krom">582</td><td class="krom">995</td><td class="krom">50%</td></tr>
+        <tr><td>With 2 Vehicles</td><td class="krom">560</td><td class="krom">192</td><td class="krom">752</td><td class="krom">38%</td></tr>
+        <tr><td>With 3 Vehicles</td><td class="krom">87</td><td class="krom">10</td><td class="krom">97</td><td class="krom">5%</td></tr>
+        <tr><td>With 4 Vehicles</td><td class="krom">47</td><td class="krom">12</td><td class="krom">59</td><td class="krom">3%</td></tr>
+        <tr><td>With 5+ Vehicles</td><td class="krom">0</td><td class="krom">0</td><td class="krom">0</td><td class="krom">0%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout blue">
+      <strong>What Krom's framing emphasizes:</strong> "76% of renters have 1 or 0 cars" — used to argue low parking demand and justify the 0.7 standard and exemptions.
+    </div>
+
+    <div class="callout red">
+      <strong>What that framing obscures:</strong> Only 11% of renters have zero cars. The remaining 65% who have exactly 1 car still need a parking space. Grouping them together is a statistical sleight of hand.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: MARGIN OF ERROR CRISIS -->
+<section>
+  <div class="container">
+    <h2>2. The Margin of Error Problem</h2>
+    <p class="section-intro">ACS estimates for small geographies like Narberth Borough (~4,400 residents) carry substantial margins of error. Narberth is a small place — the ACS samples a fraction of its households. This is not a critique of the Census Bureau; it is a fundamental limitation the Bureau itself acknowledges. Using these estimates as the basis for binding zoning policy is statistically inappropriate.</p>
+
+    <h3>Full Margin of Error Breakdown (Renter-Occupied Households)</h3>
+    <table class="moe-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Estimate</th>
+          <th>Margin of Error (±)</th>
+          <th>MOE as % of Estimate</th>
+          <th>Reliability</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Total Households</td>
+          <td>2,001</td>
+          <td>±159</td>
+          <td>7.95%</td>
+          <td><span class="moe-badge low">Acceptable</span></td>
+        </tr>
+        <tr>
+          <td>Owner Occupied</td>
+          <td>1,107</td>
+          <td>±149</td>
+          <td>13.46%</td>
+          <td><span class="moe-badge med">Marginal</span></td>
+        </tr>
+        <tr>
+          <td>Owner – 1 Vehicle</td>
+          <td>413</td>
+          <td>±109</td>
+          <td>26.39%</td>
+          <td><span class="moe-badge high">Unreliable</span></td>
+        </tr>
+        <tr>
+          <td>Owner – 2 Vehicles</td>
+          <td>560</td>
+          <td>±137</td>
+          <td>24.46%</td>
+          <td><span class="moe-badge high">Unreliable</span></td>
+        </tr>
+        <tr>
+          <td>Renter Occupied</td>
+          <td>894</td>
+          <td>±193</td>
+          <td>21.59%</td>
+          <td><span class="moe-badge high">Unreliable</span></td>
+        </tr>
+        <tr>
+          <td>Renter – No Vehicle</td>
+          <td>98</td>
+          <td>±80</td>
+          <td>81.63%</td>
+          <td><span class="moe-badge extreme">Statistically Invalid</span></td>
+        </tr>
+        <tr>
+          <td>Renter – 1 Vehicle</td>
+          <td>582</td>
+          <td>±149</td>
+          <td>25.60%</td>
+          <td><span class="moe-badge high">Unreliable</span></td>
+        </tr>
+        <tr>
+          <td>Renter – 2 Vehicles</td>
+          <td>192</td>
+          <td>±132</td>
+          <td>68.75%</td>
+          <td><span class="moe-badge extreme">Statistically Invalid</span></td>
+        </tr>
+        <tr>
+          <td>Renter – 3 Vehicles</td>
+          <td>10</td>
+          <td>±16</td>
+          <td><strong>160.00%</strong></td>
+          <td><span class="moe-badge extreme">Statistically Invalid</span></td>
+        </tr>
+        <tr>
+          <td>Renter – 4 Vehicles</td>
+          <td>12</td>
+          <td>±18</td>
+          <td><strong>150.00%</strong></td>
+          <td><span class="moe-badge extreme">Statistically Invalid</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout red">
+      <strong>When a margin of error exceeds 30%, the Census Bureau's own guidelines flag the estimate as unreliable for policy use.</strong> Six of the ten renter sub-categories exceed this threshold. Three exceed 68%, and two exceed 100% — meaning the true value could plausibly be zero.
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Margin of Error by Category</h3>
+        <p class="chart-subtitle">Red line = 30% threshold (Census Bureau reliability benchmark). Values above are flagged as unreliable for policy decisions.</p>
+        <canvas id="moeChart" height="280"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Renter Vehicle Ownership: Estimate vs. Possible Range</h3>
+        <p class="chart-subtitle">Error bars show ±MOE. Notice how "No Vehicle" could range from 18 to 178 households — a 10× swing.</p>
+        <canvas id="rangeChart" height="280"></canvas>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <strong>Key implication:</strong> The 98-household "no vehicle" estimate could be anywhere from 18 to 178 households. Narberth Borough Council member Cyndi Rickards noted this "does not reflect what our apartment managers report" nor anecdotal observation on surrounding streets. The error bars are simply too large for the precision this policy demands.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: REFRAMING THE RENTER DATA -->
+<section>
+  <div class="container">
+    <h2>3. What the Renter Data Actually Shows</h2>
+    <p class="section-intro">Krom's "76% have 1 or 0 cars" framing groups households that need parking (1 car) with those that don't (0 cars). Correctly disaggregated, the data tells a very different story.</p>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Krom's Framing</h3>
+        <p class="chart-subtitle">"76% of renters have 1 or 0 cars" — conflates car owners with non-owners to minimize perceived demand.</p>
+        <canvas id="kromChart" height="260"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Accurate Framing</h3>
+        <p class="chart-subtitle">88% of renters own at least one car and need at least one parking space. Only 11% own no car.</p>
+        <canvas id="accurateChart" height="260"></canvas>
+      </div>
+    </div>
+
+    <h3>Side-by-Side: Two Ways to Read the Same Data</h3>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th class="label-col">Framing</th>
+          <th class="krom">Krom's Claim</th>
+          <th class="counter">Accurate Reading</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Renters with 0 cars</td>
+          <td class="krom">Bundled into "76%"</td>
+          <td class="counter">11% (98 of 894)</td>
+        </tr>
+        <tr>
+          <td>Renters with 1 car</td>
+          <td class="krom">Bundled into "76%"</td>
+          <td class="counter">65% (582 of 894) — these people need parking</td>
+        </tr>
+        <tr>
+          <td>Renters with 2+ cars</td>
+          <td class="krom">~24%</td>
+          <td class="counter">24% (214 of 894) — these people need 2+ spaces</td>
+        </tr>
+        <tr>
+          <td><strong>Renters who own a car (need parking)</strong></td>
+          <td class="krom"><em>Not stated</em></td>
+          <td class="counter"><strong>88% (796 of 894)</strong></td>
+        </tr>
+        <tr>
+          <td>Implied parking spaces needed per unit</td>
+          <td class="krom">0.7 (proposed)</td>
+          <td class="counter">≥0.88 (minimum, single-car owners only)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="progress-row">
+      <div class="progress-label">No car (11%)</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" style="width:11%; background:#16a34a;"></div></div>
+      <div class="progress-val" style="color:var(--green);">11%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">1 car — need 1 space (65%)</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" style="width:65%; background:#2563eb;"></div></div>
+      <div class="progress-val" style="color:var(--blue);">65%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">2+ cars — need 2+ spaces (24%)</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" style="width:24%; background:#dc2626;"></div></div>
+      <div class="progress-val" style="color:var(--red);">24%</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: 198 ELMWOOD — THE MATH DOESN'T WORK -->
+<section>
+  <div class="container">
+    <h2>4. Case Study: 198 Elmwood Ave</h2>
+    <p class="section-intro">Using a hypothetical 40-unit development at 198 Elmwood Avenue as a concrete test case, we can demonstrate that the proposed parking formula fails on its own terms — using Krom's own data.</p>
+
+    <div class="stat-grid">
+      <div class="stat-card blue"><div class="number">40</div><div class="label">Total units (proposed)</div></div>
+      <div class="stat-card amber"><div class="number">4</div><div class="label">Affordable units (exempt from parking)</div></div>
+      <div class="stat-card amber"><div class="number">6–10+</div><div class="label">Under-750 sq ft units (exempt)</div></div>
+      <div class="stat-card red"><div class="number">35.2</div><div class="label">Parking spaces needed (minimum, by Krom's own data)</div></div>
+    </div>
+
+    <h3>Parking Supply vs. Demand at 198 Elmwood Ave</h3>
+
+    <table class="scenario-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Exempt Units</th>
+          <th>Spaces Required (0.7×)</th>
+          <th>Spaces Needed (88% ownership)</th>
+          <th>Deficit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="danger">
+          <td><strong>Krom's Proposed Standard</strong><br><small>4 affordable + 6 small-unit exempt</small></td>
+          <td>10</td>
+          <td>21 spaces<br><small>(0.7 × 30 non-exempt units)</small></td>
+          <td>35.2 spaces<br><small>(88% × 40 units)</small></td>
+          <td><strong>−14.2 spaces</strong></td>
+        </tr>
+        <tr class="highlight">
+          <td><strong>Maximum Possible Under Proposal</strong><br><small>Only 4 affordable units exempt, all others >750 sq ft</small></td>
+          <td>4</td>
+          <td>25.2 spaces<br><small>(0.7 × 36 units)</small></td>
+          <td>35.2 spaces</td>
+          <td><strong>−10 spaces</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Industry Standard (1.0/unit)</strong></td>
+          <td>0</td>
+          <td>40 spaces</td>
+          <td>35.2 spaces</td>
+          <td style="color:var(--green); font-weight:700;">+4.8 buffer</td>
+        </tr>
+        <tr class="safe">
+          <td><strong>Comparable Affordable Housing (Chicago planner cited)</strong><br><small>1.5–1.7 spaces/unit standard</small></td>
+          <td>0</td>
+          <td>60–68 spaces</td>
+          <td>35.2 spaces</td>
+          <td style="color:var(--green);">Substantial buffer</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="deficit-viz">
+      <div class="deficit-title">Visual: Parking Gap at 198 Elmwood (Krom's Proposed Standard)</div>
+      <canvas id="deficitChart" height="120"></canvas>
+      <div style="display:flex; gap:24px; margin-top:16px; font-size:0.85rem;">
+        <div><span style="display:inline-block; width:14px; height:14px; background:#dc2626; border-radius:3px; margin-right:6px;"></span> Spaces Needed (35.2 minimum)</div>
+        <div><span style="display:inline-block; width:14px; height:14px; background:#16a34a; border-radius:3px; margin-right:6px;"></span> Spaces Provided (21)</div>
+        <div><span style="display:inline-block; width:14px; height:14px; background:#fbbf24; border-radius:3px; margin-right:6px;"></span> Gap (14.2 unaccounted vehicles)</div>
+      </div>
+    </div>
+
+    <div class="callout red">
+      <strong>This is a hard stop.</strong> Even using Krom's own ACS data, assuming every single renter has exactly one car (minimizing demand), the proposed 0.7 standard with zero-parking exemptions would leave at minimum 14 vehicles without a dedicated space at a 40-unit building. Because some renters have 2+ cars, the actual shortfall is likely higher.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: TOD ARGUMENT -->
+<section>
+  <div class="container">
+    <h2>5. The Transit-Oriented Development Argument</h2>
+    <p class="section-intro">A likely response to parking concerns is that Narberth qualifies as a Transit-Oriented Development (TOD) zone, which often allows reduced parking. This argument fails on several grounds.</p>
+
+    <div class="tod-card">
+      <h3>What is TOD, Really?</h3>
+      <p>There is no single, legally binding federal or Pennsylvania definition of Transit-Oriented Development. Definitions vary widely across municipalities, MPOs, and state agencies. The most commonly cited standard:</p>
+      <ul style="margin: 12px 0 0 20px; line-height: 2;">
+        <li><strong>Gold standard:</strong> Within ½ mile (~10-minute walk) of a <em>high-frequency</em> rail or bus rapid transit station</li>
+        <li><strong>Commonwealth of PA precedent:</strong> Has used ½ mile from rail <em>or</em> bus stop in some contexts</li>
+        <li><strong>Problem:</strong> Under the broadest interpretation (any bus stop), nearly the entire Borough qualifies — making TOD designation meaningless as a planning distinction</li>
+      </ul>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>TOD Definition: What Qualifies?</h3>
+        <p class="chart-subtitle">Narberth train station is a SEPTA Regional Rail stop (Paoli/Thorndale line) — not a high-frequency urban rail system.</p>
+        <canvas id="todChart" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Car Ownership vs. Transit Proximity</h3>
+        <p class="chart-subtitle">High car ownership persists in suburban rail communities. Narberth is a commuter suburb, not an urban transit hub.</p>
+        <canvas id="transitChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th class="label-col">TOD Criteria</th>
+          <th class="krom">Krom's Implied Position</th>
+          <th class="counter">Reality</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Transit type</td>
+          <td class="krom">Narberth SEPTA station = TOD qualifier</td>
+          <td class="counter">Commuter rail, 1-2 trains/hr peak — not high-frequency transit</td>
+        </tr>
+        <tr>
+          <td>Geographic scope</td>
+          <td class="krom">Station area = reduced parking zone</td>
+          <td class="counter">Under broadest PA interpretation, all of Narberth is "TOD" — making it useless as a standard</td>
+        </tr>
+        <tr>
+          <td>Car ownership behavior</td>
+          <td class="krom">Transit access reduces car ownership</td>
+          <td class="counter">ACS data shows 88% of Narberth renters still own cars despite being near transit</td>
+        </tr>
+        <tr>
+          <td>Comparable standards</td>
+          <td class="krom">0.7 spaces/unit appropriate for TOD</td>
+          <td class="counter">Chicago planner cited 1.5–1.7 as standard even with density bonuses; 1.0 is typical suburban minimum</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout amber">
+      <strong>The TOD argument is a door, not a wall.</strong> Invoking TOD as justification for minimal parking opens the door to applying the same standard across the entire Borough — since all of Narberth is within ½ mile of bus stops. This is precisely the risk of using an undefined standard in zoning code.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: LOCAL SURVEY DATA -->
+<section>
+  <div class="container">
+    <h2>6. Local Survey Data: What Residents Report</h2>
+    <p class="section-intro">A neighborhood survey of Narberth Borough residents — conducted independently — collected 28 responses from households across the Borough. While not a statistically representative sample, the survey provides hyperlocal ground-truth data that directly contradicts the ACS estimates being used to justify the proposed parking standard.</p>
+
+    <div class="callout blue">
+      <strong>Note:</strong> Cyndi Rickards (Borough Council) independently noted that the ACS data "does not reflect what our apartment managers report" and does not match anecdotal observation. This survey corroborates that concern.
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card green"><div class="number">28</div><div class="label">Survey responses (deduplicated by household)</div></div>
+      <div class="stat-card blue"><div class="number">93%</div><div class="label">Respondents with at least 1 car</div></div>
+      <div class="stat-card blue"><div class="number">1.79</div><div class="label">Average cars per responding household</div></div>
+      <div class="stat-card red"><div class="number">7%</div><div class="label">Respondents with 0 cars (vs. 11% claimed in ACS)</div></div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Survey: Car Ownership Distribution</h3>
+        <p class="chart-subtitle">28 deduplicated Narberth household responses.</p>
+        <canvas id="surveyChart" height="260"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>ACS Estimate vs. Survey Results</h3>
+        <p class="chart-subtitle">% of renter/resident households with 0 cars vs. 1+ cars.</p>
+        <canvas id="acsVsSurveyChart" height="260"></canvas>
+      </div>
+    </div>
+
+    <h3>Survey Respondents</h3>
+    <div class="survey-grid" id="surveyGrid">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="callout amber">
+      <strong>Caveat:</strong> This survey is not a random sample. Respondents self-selected and may skew toward car-owning households. However, its directional finding — significantly higher car ownership than the ACS estimates — aligns with what Borough officials and apartment managers report, and suggests the ACS figures undercount vehicle ownership in Narberth.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 7: NATIONAL CONTEXT -->
+<section>
+  <div class="container">
+    <h2>7. National & Regional Benchmarks</h2>
+    <p class="section-intro">How does the proposed 0.7 standard compare to actual parking requirements in comparable suburban Philadelphia communities and national affordable housing standards?</p>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th class="label-col">Community / Standard</th>
+          <th class="label-col">Parking Requirement</th>
+          <th class="label-col">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Krom's proposal — Narberth</td><td style="color:var(--red); font-weight:700;">0.7 spaces/unit (non-exempt)</td><td>With zero-parking for affordable & &lt;750 sq ft units</td></tr>
+        <tr><td>Narberth Borough (current)</td><td>1.0–1.5 spaces/unit</td><td>Existing zoning baseline</td></tr>
+        <tr><td>Affordable housing developer (Chicago, cited by Rickards)</td><td><strong>1.5–1.7 spaces/unit</strong></td><td>1.5 for density bonus; 1.7 as standard build</td></tr>
+        <tr><td>ITE Parking Generation Manual (suburban multifamily)</td><td>~1.0–1.2 spaces/unit</td><td>Industry standard for suburban apartment</td></tr>
+        <tr><td>HUD minimum (affordable housing)</td><td>1.0 spaces/unit</td><td>Typical FHA/HUD underwriting assumption</td></tr>
+        <tr><td>Typical TOD reduction (urban, high-frequency rail)</td><td>0.5–0.8 spaces/unit</td><td>Applies to true urban TOD, not suburban commuter rail</td></tr>
+        <tr><td>Narberth survey average</td><td>1.79 cars/household</td><td>Local ground truth, all respondents</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Parking Standards Comparison</h3>
+        <p class="chart-subtitle">Krom's 0.7 proposal vs. comparable community and industry standards.</p>
+        <canvas id="benchmarkChart" height="260"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Spaces Needed at 198 Elmwood Under Each Standard</h3>
+        <p class="chart-subtitle">For a 40-unit building, how many spaces different standards would require.</p>
+        <canvas id="spacesChart" height="260"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 8: SUMMARY OF FLAWS -->
+<section>
+  <div class="container">
+    <h2>8. Summary of Identified Flaws</h2>
+
+    <div class="callout red">
+      <strong>Flaw 1: Statistically unreliable source data.</strong> Six of ten renter sub-categories in the ACS table have margins of error exceeding 30%, and three exceed 68%. The Census Bureau's own guidelines flag estimates above 30% MOE as unreliable for policy use. Three estimates have MOEs exceeding their point estimate — they are statistically indistinguishable from zero.
+    </div>
+
+    <div class="callout red">
+      <strong>Flaw 2: Misleading data framing.</strong> The "76% have 1 or 0 cars" claim combines car owners with non-owners to minimize perceived demand. By Krom's own data, 88% of renters own a car and need parking. This is the operative figure for a parking ordinance.
+    </div>
+
+    <div class="callout red">
+      <strong>Flaw 3: The math fails by its own data.</strong> At 198 Elmwood Ave (40 units, 4 affordable, 6+ under 750 sq ft), the 0.7 standard produces 21 required spaces. Krom's own 88% car-ownership figure requires at least 35.2 spaces — a minimum deficit of 14 vehicles with nowhere to park.
+    </div>
+
+    <div class="callout red">
+      <strong>Flaw 4: Zero-parking exemptions compound the problem.</strong> Affordable units and small units are, if anything, <em>more</em> likely to have single-car households (one car, not zero). Exempting them entirely from parking requirements ignores that 88% of renters — including affordable renters — own cars.
+    </div>
+
+    <div class="callout red">
+      <strong>Flaw 5: TOD designation is overbroad and undefined.</strong> Using the broad "within ½ mile of transit" definition, all of Narberth Borough qualifies as TOD — making the designation meaningless as a parking-reduction justification. True TOD standards apply to high-frequency urban transit, not suburban commuter rail with hourly headways.
+    </div>
+
+    <div class="callout red">
+      <strong>Flaw 6: Local data contradicts the ACS estimates.</strong> Borough apartment managers, Council members' anecdotal observation, and the neighborhood survey all report higher car ownership than the ACS estimates suggest. The hyperlocal data — not a broad regional survey — should inform Narberth-specific zoning.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 9: RECOMMENDATION -->
+<section>
+  <div class="container">
+    <h2>9. Recommendations</h2>
+
+    <div class="callout green">
+      <strong>1. Commission a hyperlocal parking study.</strong> ACS estimates for small geographies are unsuitable for binding zoning policy. A professional parking utilization study of existing Narberth multifamily properties would provide actionable, reliable data.
+    </div>
+
+    <div class="callout green">
+      <strong>2. Reject zero-parking exemptions.</strong> No evidence supports the claim that affordable or sub-750-sq-ft renters have materially lower car ownership rates in Narberth. All units should have a minimum parking requirement.
+    </div>
+
+    <div class="callout green">
+      <strong>3. Set a minimum of 1.0 space per unit.</strong> This aligns with HUD standards, ITE suburban guidelines, and is the floor cited by affordable housing developers. Krom's 0.7 standard falls below every comparable benchmark except true urban TOD.
+    </div>
+
+    <div class="callout green">
+      <strong>4. Define TOD explicitly before applying it as a standard.</strong> Any ordinance using TOD as a basis for parking reduction must define the geographic scope, transit frequency threshold, and applicable route types — or it will be applied borough-wide with no limiting principle.
+    </div>
+
+    <div class="callout green">
+      <strong>5. Engage apartment managers directly.</strong> Narberth's existing apartment managers have firsthand knowledge of tenant vehicle ownership. Their operational data — which Borough Council already notes contradicts the ACS — should be incorporated into any parking study.
+    </div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="container">
+    <h3>Sources & Methodology</h3>
+    <ul>
+      <li><strong>Adam Krom (2026):</strong> ACS vehicle availability cross-tab, shared via email to Narberth Borough Council, May 23, 2026</li>
+      <li><strong>U.S. Census Bureau, ACS 5-Year Estimates (2024 Release):</strong> Table B25044 — Tenure by Vehicles Available, Narberth Borough CDP (Place Code 42526). <a href="https://data.census.gov/table/ACSDT5Y2024.B25044?q=B25044&g=160XX00US42526" target="_blank">data.census.gov</a></li>
+      <li><strong>Census Bureau guidance on ACS reliability:</strong> "When to Use 1-Year vs. 5-Year ACS Data" — estimates with CV (coefficient of variation) >40% are flagged as unreliable. A MOE/estimate ratio >30% approximates a CV of ~18%, and items above this threshold should be used with caution for policy decisions.</li>
+      <li><strong>SouthSide Narberth Neighborhood Survey (May 2026):</strong> 28 deduplicated household responses collected via Tally form. Self-selected sample; directional use only.</li>
+      <li><strong>Borough Council correspondence:</strong> Email chain between Cyndi Rickards, Adam Krom, Maggie Dobbs, Adam Schantz (Montgomery County), and Frederic Bush, May 23–25, 2026</li>
+      <li><strong>ITE Parking Generation Manual, 5th Edition:</strong> Institute of Transportation Engineers — suburban multifamily parking rates</li>
+      <li><strong>HUD/FHA Multifamily Housing Standards</strong></li>
+      <li><strong>SEPTA Regional Rail schedules:</strong> Paoli/Thorndale line, Narberth Station</li>
+      <li><strong>Matt Patrick (2026):</strong> 198 Elmwood Ave parking scenario analysis, correspondence with Cyndi Rickards, May 25, 2026</li>
+    </ul>
+    <p style="margin-top:24px; opacity:0.6;">Prepared May 2026 · Narberth Borough, PA 19072 · This document is intended for public comment and civic deliberation purposes.</p>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const surveyData = [
+  { name: "Robert T BENNER", address: "309 S Narberth Ave Apt1/GAR", cars: 0, driveway: "Yes" },
+  { name: "Judy Watman", address: "120 Elmwood Ave", cars: 2, driveway: "Yes" },
+  { name: "Qin Liu", address: "121 Woodside Ave", cars: 1, driveway: "Yes" },
+  { name: "Sipe family", address: "110 Woodside", cars: 1, driveway: "Yes" },
+  { name: "Jeff", address: "305 Woodside Ave", cars: 2, driveway: "No" },
+  { name: "John Crowley", address: "107 Merion Ave", cars: 2, driveway: "Yes" },
+  { name: "Beth Schuster", address: "118 Elmwood Ave", cars: 2, driveway: "Yes" },
+  { name: "Danielle Miller", address: "201 Merion Avenue", cars: 2, driveway: "Yes" },
+  { name: "Marie Sweeney", address: "201 Chestnut Ave", cars: 2, driveway: "No" },
+  { name: "Nicholas Morinigo", address: "135 Merion", cars: 3, driveway: "Yes" },
+  { name: "Tina Geary", address: "303 S. Narberth Ave.", cars: 2, driveway: "Yes" },
+  { name: "Maureen Readinger", address: "302 N Narberth Ave", cars: 2, driveway: "Yes" },
+  { name: "Robert Readinger Jr", address: "302 N Narberth Ave", cars: 2, driveway: "Yes" },
+  { name: "Geraud", address: "108 Elmwood Ave", cars: 2, driveway: "Yes" },
+  { name: "Lisa Saar", address: "125 Elmwood Ave", cars: 0, driveway: "No" },
+  { name: "Pamela Pressman", address: "106 Woodside Ave", cars: 2, driveway: "Yes" },
+  { name: "Sherwin Lott", address: "127 Woodside Avenue", cars: 2, driveway: "Yes" },
+  { name: "Anna Patrick", address: "409 Woodside Ave", cars: 2, driveway: "Yes" },
+  { name: "Matt", address: "Grove Pl", cars: 0, driveway: "Yes" },
+  { name: "Linshuang Lu", address: "411 Grove Pl", cars: 0, driveway: "Yes" },
+  { name: "Céline O'Neill", address: "126 Chestnut Ave", cars: 3, driveway: "Yes" },
+  { name: "Robin Currie", address: "215 Chestnut Ave", cars: 2, driveway: "Yes" },
+  { name: "Kim Bourassa", address: "104 Woodside Ave", cars: 2, driveway: "Yes" },
+  { name: "Deborah Lonsdorf", address: "128 Chestnut Avenue", cars: 1, driveway: "No" },
+  { name: "Christine Kondo", address: "401 S Narberth Apt 1B", cars: 1, driveway: "No" },
+  { name: "Chris Calvert", address: "161 Merion Ave", cars: 2, driveway: "Yes" },
+  { name: "Janet Frazer", address: "316 Merion Ave", cars: 1, driveway: "No" },
+  { name: "Bill Garrity", address: "226 N Essex Ave", cars: 2, driveway: "Yes" }
+];
+
+// ─── POPULATE SURVEY CARDS ──────────────────────────────────────────────────
+
+const grid = document.getElementById('surveyGrid');
+surveyData.forEach(r => {
+  const card = document.createElement('div');
+  card.className = 'survey-card';
+  card.innerHTML = `
+    <div class="name">${r.name}</div>
+    <div class="address">📍 ${r.address}</div>
+    <div class="cars">${r.cars} 🚗</div>
+    <div style="font-size:0.82rem; color:var(--gray); margin-top:4px;">Driveway: ${r.driveway}</div>
+  `;
+  grid.appendChild(card);
+});
+
+// ─── CHART DEFAULTS ─────────────────────────────────────────────────────────
+
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+Chart.defaults.font.size = 12;
+
+// ─── MOE CHART ──────────────────────────────────────────────────────────────
+
+new Chart(document.getElementById('moeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['All HH', 'Owner Occ.', 'Owner 1-car', 'Owner 2-car', 'Renter Occ.', 'Renter 0-car', 'Renter 1-car', 'Renter 2-car', 'Renter 3-car', 'Renter 4-car'],
+    datasets: [{
+      label: 'MOE as % of Estimate',
+      data: [7.95, 13.46, 26.39, 24.46, 21.59, 81.63, 25.60, 68.75, 160, 150],
+      backgroundColor: [7.95, 13.46, 26.39, 24.46, 21.59, 81.63, 25.60, 68.75, 160, 150].map(v =>
+        v < 30 ? '#16a34a' : v < 60 ? '#d97706' : '#dc2626'
+      ),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      annotation: { annotations: {} }
+    },
+    scales: {
+      y: {
+        title: { display: true, text: 'MOE %' },
+        ticks: {
+          callback: v => v + '%'
+        }
+      },
+      x: { ticks: { maxRotation: 45 } }
+    }
+  }
+});
+
+// ─── RANGE CHART ────────────────────────────────────────────────────────────
+
+new Chart(document.getElementById('rangeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['0 Cars\n(est. 98)', '1 Car\n(est. 582)', '2 Cars\n(est. 192)', '3 Cars\n(est. 10)', '4 Cars\n(est. 12)'],
+    datasets: [
+      {
+        label: 'Low Estimate (est - MOE)',
+        data: [18, 433, 60, 0, 0],
+        backgroundColor: 'rgba(220, 38, 38, 0.3)',
+        borderColor: '#dc2626',
+        borderWidth: 1,
+      },
+      {
+        label: 'Point Estimate',
+        data: [98, 582, 192, 10, 12],
+        backgroundColor: '#2563eb',
+      },
+      {
+        label: 'High Estimate (est + MOE)',
+        data: [178, 731, 324, 26, 30],
+        backgroundColor: 'rgba(37, 99, 235, 0.3)',
+        borderColor: '#2563eb',
+        borderWidth: 1,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 14 } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Renter Households' } }
+    }
+  }
+});
+
+// ─── KROM'S FRAMING PIE ────────────────────────────────────────────────────
+
+new Chart(document.getElementById('kromChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['"1 or 0 Cars" (combined)', '2+ Cars'],
+    datasets: [{
+      data: [76, 24],
+      backgroundColor: ['#dc2626', '#6b7280'],
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: { callbacks: { label: c => ` ${c.label}: ${c.parsed}%` } }
+    }
+  }
+});
+
+// ─── ACCURATE PIE ───────────────────────────────────────────────────────────
+
+new Chart(document.getElementById('accurateChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['0 Cars (no parking needed)', '1 Car (need 1 space)', '2+ Cars (need 2+ spaces)'],
+    datasets: [{
+      data: [11, 65, 24],
+      backgroundColor: ['#16a34a', '#2563eb', '#dc2626'],
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: { callbacks: { label: c => ` ${c.label}: ${c.parsed}%` } }
+    }
+  }
+});
+
+// ─── DEFICIT CHART ──────────────────────────────────────────────────────────
+
+new Chart(document.getElementById('deficitChart'), {
+  type: 'bar',
+  data: {
+    labels: ['198 Elmwood Ave (40 units)'],
+    datasets: [
+      {
+        label: 'Spaces Provided (0.7 × 30 non-exempt)',
+        data: [21],
+        backgroundColor: '#16a34a',
+        borderRadius: 4,
+      },
+      {
+        label: 'Additional Needed (gap)',
+        data: [14.2],
+        backgroundColor: '#fbbf24',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: {
+        callbacks: {
+          label: c => ` ${c.dataset.label}: ${c.parsed.x} spaces`
+        }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        title: { display: true, text: 'Parking Spaces' },
+        max: 40,
+        ticks: { callback: v => v }
+      },
+      y: { stacked: true }
+    }
+  }
+});
+
+// ─── TOD CHART ──────────────────────────────────────────────────────────────
+
+new Chart(document.getElementById('todChart'), {
+  type: 'bar',
+  data: {
+    labels: ['True Urban TOD\n(subway/BRT)', 'Suburban Commuter Rail\n(like Narberth)', 'Bus Stop Access\n(entire borough)'],
+    datasets: [{
+      label: 'Typical Parking Reduction Allowed',
+      data: [50, 20, 5],
+      backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        title: { display: true, text: '% Parking Reduction (typical)' },
+        ticks: { callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+// ─── TRANSIT COMPARISON ─────────────────────────────────────────────────────
+
+new Chart(document.getElementById('transitChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Philadelphia\n(Center City)', 'Ardmore\n(SEPTA suburban)', 'Narberth\n(ACS estimate)', 'Narberth\n(survey)'],
+    datasets: [{
+      label: '% Households with at Least 1 Car',
+      data: [58, 78, 88, 93],
+      backgroundColor: ['#6b7280', '#d97706', '#2563eb', '#dc2626'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        title: { display: true, text: '% with ≥1 Car' },
+        min: 0, max: 100,
+        ticks: { callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+// ─── SURVEY DISTRIBUTION ────────────────────────────────────────────────────
+
+const carCounts = [0, 0, 0, 0, 0];
+surveyData.forEach(r => { if (r.cars <= 4) carCounts[r.cars]++; });
+
+new Chart(document.getElementById('surveyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['0 Cars', '1 Car', '2 Cars', '3 Cars', '4+ Cars'],
+    datasets: [{
+      label: 'Survey Respondents',
+      data: carCounts,
+      backgroundColor: ['#16a34a', '#2563eb', '#dc2626', '#d97706', '#6b7280'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` ${c.parsed.y} households` } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Households' }, ticks: { stepSize: 1 } }
+    }
+  }
+});
+
+// ─── ACS vs SURVEY ──────────────────────────────────────────────────────────
+
+new Chart(document.getElementById('acsVsSurveyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['0 Cars (no parking needed)', '1 Car', '2+ Cars'],
+    datasets: [
+      {
+        label: 'ACS Estimate (Krom)',
+        data: [11, 65, 24],
+        backgroundColor: 'rgba(220, 38, 38, 0.7)',
+        borderRadius: 4,
+      },
+      {
+        label: 'Local Survey',
+        data: [
+          Math.round(surveyData.filter(r => r.cars === 0).length / surveyData.length * 100),
+          Math.round(surveyData.filter(r => r.cars === 1).length / surveyData.length * 100),
+          Math.round(surveyData.filter(r => r.cars >= 2).length / surveyData.length * 100),
+        ],
+        backgroundColor: 'rgba(37, 99, 235, 0.7)',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y}%` } }
+    },
+    scales: {
+      y: {
+        title: { display: true, text: '% of Households' },
+        ticks: { callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+// ─── BENCHMARK CHART ────────────────────────────────────────────────────────
+
+new Chart(document.getElementById('benchmarkChart'), {
+  type: 'bar',
+  data: {
+    labels: ["Krom's\nProposal", 'Urban\nTOD Min', 'HUD\nMinimum', 'Current\nNarberth', 'ITE\nSuburban', 'Affordable\nHousing Dev\n(Chicago)'],
+    datasets: [{
+      label: 'Spaces per Unit',
+      data: [0.7, 0.5, 1.0, 1.25, 1.1, 1.6],
+      backgroundColor: ['#dc2626', '#d97706', '#6b7280', '#2563eb', '#6b7280', '#16a34a'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        title: { display: true, text: 'Spaces per Unit' },
+        min: 0, max: 2,
+        ticks: { stepSize: 0.25 }
+      }
+    }
+  }
+});
+
+// ─── SPACES NEEDED CHART ────────────────────────────────────────────────────
+
+new Chart(document.getElementById('spacesChart'), {
+  type: 'bar',
+  data: {
+    labels: ["Krom's\nProposal\n(best case)", 'HUD\nMinimum', 'Actual Need\n(ACS 88%)', 'ITE\nSuburban', 'Affordable\nDeveloper\nStandard'],
+    datasets: [{
+      label: 'Parking Spaces at 40-unit Building',
+      data: [25.2, 40, 35.2, 44, 64],
+      backgroundColor: ['#dc2626', '#6b7280', '#d97706', '#6b7280', '#16a34a'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` ${c.parsed.y} spaces` } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Parking Spaces Required' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
