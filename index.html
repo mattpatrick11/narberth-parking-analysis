@@ -314,9 +314,8 @@
       font-size: 0.9rem;
     }
 
-    .survey-card .name { font-weight: 700; color: var(--navy); }
-    .survey-card .address { color: var(--gray); font-size: 0.82rem; margin-bottom: 8px; }
     .survey-card .cars { font-size: 1.3rem; font-weight: 900; color: var(--blue); }
+    .survey-card .respondent-label { font-weight: 600; color: var(--navy); font-size: 0.85rem; margin-bottom: 6px; }
 
     /* SOURCE FOOTER */
     .sources {
@@ -865,7 +864,7 @@
       </div>
     </div>
 
-    <h3>Survey Respondents</h3>
+    <h3>Survey Responses (Anonymized)</h3>
     <div class="survey-grid" id="surveyGrid">
       <!-- filled by JS -->
     </div>
@@ -1245,45 +1244,44 @@
 // ─── DATA ───────────────────────────────────────────────────────────────────
 
 const surveyData = [
-  { name: "Robert T BENNER", address: "309 S Narberth Ave Apt1/GAR", cars: 0, driveway: "Yes" },
-  { name: "Judy Watman", address: "120 Elmwood Ave", cars: 2, driveway: "Yes" },
-  { name: "Qin Liu", address: "121 Woodside Ave", cars: 1, driveway: "Yes" },
-  { name: "Sipe family", address: "110 Woodside", cars: 1, driveway: "Yes" },
-  { name: "Jeff", address: "305 Woodside Ave", cars: 2, driveway: "No" },
-  { name: "John Crowley", address: "107 Merion Ave", cars: 2, driveway: "Yes" },
-  { name: "Beth Schuster", address: "118 Elmwood Ave", cars: 2, driveway: "Yes" },
-  { name: "Danielle Miller", address: "201 Merion Avenue", cars: 2, driveway: "Yes" },
-  { name: "Marie Sweeney", address: "201 Chestnut Ave", cars: 2, driveway: "No" },
-  { name: "Nicholas Morinigo", address: "135 Merion", cars: 3, driveway: "Yes" },
-  { name: "Tina Geary", address: "303 S. Narberth Ave.", cars: 2, driveway: "Yes" },
-  { name: "Maureen Readinger", address: "302 N Narberth Ave", cars: 2, driveway: "Yes" },
-  { name: "Robert Readinger Jr", address: "302 N Narberth Ave", cars: 2, driveway: "Yes" },
-  { name: "Geraud", address: "108 Elmwood Ave", cars: 2, driveway: "Yes" },
-  { name: "Lisa Saar", address: "125 Elmwood Ave", cars: 0, driveway: "No" },
-  { name: "Pamela Pressman", address: "106 Woodside Ave", cars: 2, driveway: "Yes" },
-  { name: "Sherwin Lott", address: "127 Woodside Avenue", cars: 2, driveway: "Yes" },
-  { name: "Anna Patrick", address: "409 Woodside Ave", cars: 2, driveway: "Yes" },
-  { name: "Matt", address: "Grove Pl", cars: 0, driveway: "Yes" },
-  { name: "Linshuang Lu", address: "411 Grove Pl", cars: 0, driveway: "Yes" },
-  { name: "Céline O'Neill", address: "126 Chestnut Ave", cars: 3, driveway: "Yes" },
-  { name: "Robin Currie", address: "215 Chestnut Ave", cars: 2, driveway: "Yes" },
-  { name: "Kim Bourassa", address: "104 Woodside Ave", cars: 2, driveway: "Yes" },
-  { name: "Deborah Lonsdorf", address: "128 Chestnut Avenue", cars: 1, driveway: "No" },
-  { name: "Christine Kondo", address: "401 S Narberth Apt 1B", cars: 1, driveway: "No" },
-  { name: "Chris Calvert", address: "161 Merion Ave", cars: 2, driveway: "Yes" },
-  { name: "Janet Frazer", address: "316 Merion Ave", cars: 1, driveway: "No" },
-  { name: "Bill Garrity", address: "226 N Essex Ave", cars: 2, driveway: "Yes" }
+  { cars: 0, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 1, driveway: "Yes" },
+  { cars: 1, driveway: "Yes" },
+  { cars: 2, driveway: "No" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "No" },
+  { cars: 3, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 0, driveway: "No" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 0, driveway: "Yes" },
+  { cars: 0, driveway: "Yes" },
+  { cars: 3, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 1, driveway: "No" },
+  { cars: 1, driveway: "No" },
+  { cars: 2, driveway: "Yes" },
+  { cars: 1, driveway: "No" },
+  { cars: 2, driveway: "Yes" }
 ];
 
 // ─── POPULATE SURVEY CARDS ──────────────────────────────────────────────────
 
 const grid = document.getElementById('surveyGrid');
-surveyData.forEach(r => {
+surveyData.forEach((r, i) => {
   const card = document.createElement('div');
   card.className = 'survey-card';
   card.innerHTML = `
-    <div class="name">${r.name}</div>
-    <div class="address">📍 ${r.address}</div>
+    <div class="respondent-label">Respondent #${i + 1}</div>
     <div class="cars">${r.cars} 🚗</div>
     <div style="font-size:0.82rem; color:var(--gray); margin-top:4px;">Driveway: ${r.driveway}</div>
   `;
