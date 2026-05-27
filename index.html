@@ -742,13 +742,7 @@
           <td>35.2 spaces</td>
           <td style="color:var(--green); font-weight:700;">+4.8 buffer</td>
         </tr>
-        <tr class="safe">
-          <td><strong>Comparable Affordable Housing (Chicago planner cited)</strong><br><small>1.5–1.7 spaces/unit standard</small></td>
-          <td>0</td>
-          <td>60–68 spaces</td>
-          <td>35.2 spaces</td>
-          <td style="color:var(--green);">Substantial buffer</td>
-        </tr>
+
       </tbody>
     </table>
 
@@ -824,7 +818,7 @@
         <tr>
           <td>Comparable standards</td>
           <td class="krom">0.7 spaces/unit appropriate for TOD</td>
-          <td class="counter">Chicago planner cited 1.5–1.7 as standard even with density bonuses; 1.0 is typical suburban minimum</td>
+          <td class="counter">1.0 spaces/unit is the typical suburban minimum; industry standards for suburban multifamily range from 1.0–1.2</td>
         </tr>
       </tbody>
     </table>
@@ -943,7 +937,6 @@
       <tbody>
         <tr><td>Krom's proposal — Narberth</td><td style="color:var(--red); font-weight:700;">0.7 spaces/unit (non-exempt)</td><td>With zero-parking for affordable & &lt;750 sq ft units</td></tr>
         <tr><td>Narberth Borough (current)</td><td>1.0–1.5 spaces/unit</td><td>Existing zoning baseline</td></tr>
-        <tr><td>Affordable housing developer (Chicago, cited by Rickards)</td><td><strong>1.5–1.7 spaces/unit</strong></td><td>1.5 for density bonus; 1.7 as standard build</td></tr>
         <tr><td>ITE Parking Generation Manual (suburban multifamily)</td><td>~1.0–1.2 spaces/unit</td><td>Industry standard for suburban apartment</td></tr>
         <tr><td>HUD minimum (affordable housing)</td><td>1.0 spaces/unit</td><td>Typical FHA/HUD underwriting assumption</td></tr>
         <tr><td>Typical TOD reduction (urban, high-frequency rail)</td><td>0.5–0.8 spaces/unit</td><td>Applies to true urban TOD, not suburban commuter rail</td></tr>
@@ -1633,11 +1626,11 @@ new Chart(document.getElementById('acsVsSurveyChart'), {
 new Chart(document.getElementById('benchmarkChart'), {
   type: 'bar',
   data: {
-    labels: ["Krom's\nProposal", 'Urban\nTOD Min', 'HUD\nMinimum', 'Current\nNarberth', 'ITE\nSuburban', 'Affordable\nHousing Dev\n(Chicago)'],
+    labels: ["Krom's\nProposal", 'Urban\nTOD Min', 'HUD\nMinimum', 'Current\nNarberth', 'ITE\nSuburban'],
     datasets: [{
       label: 'Spaces per Unit',
-      data: [0.7, 0.5, 1.0, 1.25, 1.1, 1.6],
-      backgroundColor: ['#dc2626', '#d97706', '#6b7280', '#2563eb', '#6b7280', '#16a34a'],
+      data: [0.7, 0.5, 1.0, 1.25, 1.1],
+      backgroundColor: ['#dc2626', '#d97706', '#6b7280', '#2563eb', '#6b7280'],
       borderRadius: 4,
     }]
   },
@@ -1659,11 +1652,11 @@ new Chart(document.getElementById('benchmarkChart'), {
 new Chart(document.getElementById('spacesChart'), {
   type: 'bar',
   data: {
-    labels: ["Krom's\nProposal\n(best case)", 'HUD\nMinimum', 'Actual Need\n(ACS 88%)', 'ITE\nSuburban', 'Affordable\nDeveloper\nStandard'],
+    labels: ["Krom's\nProposal\n(best case)", 'HUD\nMinimum', 'Actual Need\n(ACS 88%)', 'ITE\nSuburban'],
     datasets: [{
       label: 'Parking Spaces at 40-unit Building',
-      data: [25.2, 40, 35.2, 44, 64],
-      backgroundColor: ['#dc2626', '#6b7280', '#d97706', '#6b7280', '#16a34a'],
+      data: [25.2, 40, 35.2, 44],
+      backgroundColor: ['#dc2626', '#6b7280', '#d97706', '#6b7280'],
       borderRadius: 4,
     }]
   },
