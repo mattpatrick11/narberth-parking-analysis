@@ -457,7 +457,7 @@
         <div class="label">Parking space deficit at 198 Elmwood Ave under proposed rules</div>
       </div>
       <div class="stat-card green">
-        <div class="number">86%</div>
+        <div class="number">95%</div>
         <div class="label">Local survey respondents who own at least 1 car</div>
       </div>
     </div>
@@ -833,23 +833,23 @@
 <section>
   <div class="container">
     <h2>6. Local Survey Data: What Residents Report</h2>
-    <p class="section-intro">A neighborhood survey of Narberth Borough residents — conducted independently — collected 28 responses from households across the Borough. While not a statistically representative sample, the survey provides hyperlocal ground-truth data that directly contradicts the ACS estimates being used to justify the proposed parking standard.</p>
+    <p class="section-intro">A neighborhood survey of Narberth Borough residents — conducted independently — collected 55 responses from households across the Borough. While not a statistically representative sample, the survey provides hyperlocal ground-truth data that directly contradicts the ACS estimates being used to justify the proposed parking standard.</p>
 
     <div class="callout blue">
       <strong>Note:</strong> Cyndi Rickards (Borough Council) independently noted that the ACS data "does not reflect what our apartment managers report" and does not match anecdotal observation. This survey corroborates that concern.
     </div>
 
     <div class="stat-grid">
-      <div class="stat-card green"><div class="number">28</div><div class="label">Survey responses (deduplicated by household)</div></div>
-      <div class="stat-card blue"><div class="number">86%</div><div class="label">Respondents with at least 1 car</div></div>
-      <div class="stat-card blue"><div class="number">1.61</div><div class="label">Average cars per responding household</div></div>
-      <div class="stat-card red"><div class="number">14%</div><div class="label">Respondents with 0 cars (note: survey skews to homeowners)</div></div>
+      <div class="stat-card green"><div class="number">55</div><div class="label">Survey responses (deduplicated by household)</div></div>
+      <div class="stat-card blue"><div class="number">95%</div><div class="label">Respondents with at least 1 car</div></div>
+      <div class="stat-card blue"><div class="number">1.87</div><div class="label">Average cars per responding household</div></div>
+      <div class="stat-card red"><div class="number">5%</div><div class="label">Respondents with 0 cars (note: survey skews to homeowners)</div></div>
     </div>
 
     <div class="chart-grid">
       <div class="chart-card">
         <h3>Survey: Car Ownership Distribution</h3>
-        <p class="chart-subtitle">28 deduplicated Narberth household responses.</p>
+        <p class="chart-subtitle">55 deduplicated Narberth household responses.</p>
         <canvas id="surveyChart" height="260"></canvas>
       </div>
       <div class="chart-card">
@@ -874,7 +874,7 @@
       </div>
       <div class="chart-card">
         <h3>How Many Times Each Option Was Ranked #1 (Most Preferred)</h3>
-        <p class="chart-subtitle">Out of 28 respondents. Single Family received 24 first-place votes. Max Density received just 2.</p>
+        <p class="chart-subtitle">Out of 55 respondents. Single Family received 45 first-place votes. Max Density received just 2.</p>
         <canvas id="rank1Chart" height="240"></canvas>
       </div>
     </div>
@@ -940,7 +940,7 @@
         <tr><td>ITE Parking Generation Manual (suburban multifamily)</td><td>~1.0–1.2 spaces/unit</td><td>Industry standard for suburban apartment</td></tr>
         <tr><td>HUD minimum (affordable housing)</td><td>1.0 spaces/unit</td><td>Typical FHA/HUD underwriting assumption</td></tr>
         <tr><td>Typical TOD reduction (urban, high-frequency rail)</td><td>0.5–0.8 spaces/unit</td><td>Applies to true urban TOD, not suburban commuter rail</td></tr>
-        <tr><td>Narberth survey average</td><td>1.61 cars/household</td><td>Local ground truth, all respondents</td></tr>
+        <tr><td>Narberth survey average</td><td>1.87 cars/household</td><td>Local ground truth, all respondents</td></tr>
       </tbody>
     </table>
 
@@ -1264,7 +1264,7 @@
       <li><strong>Adam Krom (2026):</strong> ACS vehicle availability cross-tab, shared via email to Narberth Borough Council, May 23, 2026</li>
       <li><strong>U.S. Census Bureau, ACS 5-Year Estimates (2024 Release):</strong> Table B25044 — Tenure by Vehicles Available, Narberth Borough CDP (Place Code 42526). <a href="https://data.census.gov/table/ACSDT5Y2024.B25044?q=B25044&g=160XX00US42526" target="_blank">data.census.gov</a></li>
       <li><strong>Census Bureau guidance on ACS reliability:</strong> "When to Use 1-Year vs. 5-Year ACS Data" — estimates with CV (coefficient of variation) >40% are flagged as unreliable. A MOE/estimate ratio >30% approximates a CV of ~18%, and items above this threshold should be used with caution for policy decisions.</li>
-      <li><strong>SouthSide Narberth Neighborhood Survey (May 2026):</strong> 28 deduplicated household responses collected via Tally form. Self-selected sample; directional use only.</li>
+      <li><strong>SouthSide Narberth Neighborhood Survey (May 2026):</strong> 55 deduplicated household responses collected via Tally form. Self-selected sample; directional use only.</li>
       <li><strong>Borough Council correspondence:</strong> Email chain between Cyndi Rickards, Adam Krom, Maggie Dobbs, Adam Schantz (Montgomery County), and Frederic Bush, May 23–25, 2026</li>
       <li><strong>ITE Parking Generation Manual, 5th Edition:</strong> Institute of Transportation Engineers — suburban multifamily parking rates</li>
       <li><strong>HUD/FHA Multifamily Housing Standards</strong></li>
@@ -1289,34 +1289,61 @@
 
 // 1=most preferred, 4=least preferred
 const surveyData = [
-  { cars: 0, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 1, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 1 },
-  { cars: 1, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 2, driveway: "No",   max: 4, med: 4, low: 4, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 2, driveway: "No",   max: 4, med: 4, low: 4, sfh: 3 },
-  { cars: 3, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 1 },
-  { cars: 0, driveway: "No",   max: 4, med: 4, low: 2, sfh: 1 },
+  { cars: 1, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 2, driveway: "Yes",  max: 4, med: 4, low: 3, sfh: 1 },
   { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 0, driveway: "Yes",  max: 1, med: 2, low: 3, sfh: 4 },
-  { cars: 0, driveway: "Yes",  max: 1, med: 2, low: 3, sfh: 4 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 1, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 3, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 3, driveway: "Yes",  max: 4, med: 1, low: 2, sfh: 3 },
+  { cars: 0, driveway: "No",   max: 4, med: 4, low: 2, sfh: 1 },
+  { cars: 3, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 1, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 3, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 3, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 4, low: 4, sfh: 3 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 1, med: 2, low: 3, sfh: 4 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 0, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 4, low: 4, sfh: 4 },
+  { cars: 2, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 3, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
   { cars: 1, driveway: "No",   max: 4, med: 2, low: 1, sfh: 4 },
   { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
-  { cars: 1, driveway: "No",   max: 4, med: 4, low: 1, sfh: 1 },
-  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 }
+  { cars: 1, driveway: "No",   max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 3, driveway: "No",   max: 4, med: 4, low: 4, sfh: 1 },
+  { cars: 3, driveway: "No",   max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 1, sfh: 2 },
+  { cars: 2, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 0, driveway: "Yes",  max: 1, med: 2, low: 3, sfh: 4 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 2, low: 1, sfh: 3 },
+  { cars: 4, driveway: "Yes",  max: 4, med: 2, low: 1, sfh: 2 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "Yes",  max: 2, med: 1, low: 3, sfh: 4 },
+  { cars: 1, driveway: "Yes",  max: 4, med: 3, low: 2, sfh: 1 },
+  { cars: 2, driveway: "No",   max: 4, med: 4, low: 1, sfh: 1 },
 ];
 
 // ─── POPULATE SURVEY CARDS ──────────────────────────────────────────────────
@@ -1755,8 +1782,8 @@ new Chart(document.getElementById('rank1Chart'), {
     plugins: { legend: { display: false } },
     scales: {
       y: {
-        min: 0, max: 28,
-        title: { display: true, text: 'Number of Respondents (out of 28)' },
+        min: 0, max: 55,
+        title: { display: true, text: 'Number of Respondents (out of 55)' },
         ticks: { stepSize: 4 }
       }
     }
